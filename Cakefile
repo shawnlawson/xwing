@@ -14,7 +14,7 @@ String.prototype.endswith = (suffix) ->
     this.indexOf(suffix) == (this.length - suffix.length)
 
 hamls = [
-    'index.haml'
+    'index.haml', 'extra.haml'
 ]
 
 task 'build', 'build X-Wing from source', (cb) ->

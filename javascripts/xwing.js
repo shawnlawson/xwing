@@ -206,13 +206,16 @@
       this.list_modal = $(document.createElement('DIV'));
       this.list_modal.addClass('modal hide fade text-list-modal');
       this.container.append(this.list_modal);
-      this.list_modal.append($.trim("<div class=\"modal-header\">\n    <button type=\"button\" class=\"close hidden-print\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\n\n    <div class=\"hidden-phone hidden-print\">\n        <div class=\"fancy-header\">\n            <div class=\"squad-name\"></div>\n            <div class=\"mask\">\n                <div class=\"outer-circle\">\n                    <div class=\"inner-circle\">\n                        <span class=\"total-points\"></span>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"fancy-under-header\"></div>\n    </div>\n\n    <div class=\"visible-print\">\n        <div class=\"fancy-header\">\n            <div class=\"squad-name\"></div>\n            <div class=\"mask\">\n                <div class=\"outer-circle\">\n                    <div class=\"inner-circle\">\n                        <span class=\"total-points\"></span>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"fancy-under-header\"></div>\n    </div>\n\n    <div class=\"visible-phone hidden-print\">\n        <h4><span class=\"squad-name\"></span> (<span class=\"total-points\"></span>)<h4>\n    </div>\n\n</div>\n<div class=\"modal-body\">\n    <div class=\"fancy-list hidden-phone\"></div>\n    <div class=\"simple-list\"></div>\n    <div class=\"bbcode-list\">\n        Copy the BBCode below and paste it into your forum post.\n        <textarea></textarea>\n    </div>\n</div>\n<div class=\"modal-footer hidden-print\">\n    <div class=\"btn-group list-display-mode\">\n        <button class=\"btn select-simple-view\">Simple</button>\n        <button class=\"btn select-fancy-view hidden-phone\">Fancy</button>\n        <button class=\"btn select-bbcode-view\">BBCode</button>\n    </div>\n    <button class=\"btn print-list hidden-phone\"><i class=\"icon-print\"></i>&nbsp;Print</button>\n    <button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">Close</button>\n</div>"));
+      this.list_modal.append($.trim("<div class=\"modal-header\">\n    <button type=\"button\" class=\"close hidden-print\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\n\n    <div class=\"hidden-phone hidden-print\">\n        <div class=\"fancy-header\">\n            <div class=\"squad-name\"></div>\n            <div class=\"mask\">\n                <div class=\"outer-circle\">\n                    <div class=\"inner-circle\">\n                        <span class=\"total-points\"></span>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"fancy-under-header\"></div>\n    </div>\n\n    <div class=\"visible-print\">\n        <div class=\"fancy-header\">\n            <div class=\"squad-name\"></div>\n            <div class=\"mask\">\n                <div class=\"outer-circle\">\n                    <div class=\"inner-circle\">\n                        <span class=\"total-points\"></span>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"fancy-under-header\"></div>\n    </div>\n\n    <div class=\"visible-phone hidden-print\">\n        <h4><span class=\"squad-name\"></span> (<span class=\"total-points\"></span>)<h4>\n    </div>\n\n</div>\n<div class=\"modal-body\">\n    <div class=\"fancy-list hidden-phone\"></div>\n    <div class=\"simple-list\"></div>\n    <div class=\"bbcode-list\">\n        Copy the BBCode below and paste it into your forum post.\n        <textarea></textarea>\n    </div>\n    <div class=\"xml-list\">\n        something\n        <textarea></textarea>\n    </div>\n</div>\n<div class=\"modal-footer hidden-print\">\n    <div class=\"btn-group list-display-mode\">\n        <button class=\"btn select-simple-view\">Simple</button>\n        <button class=\"btn select-fancy-view hidden-phone\">Fancy</button>\n        <button class=\"btn select-bbcode-view\">BBCode</button>\n        <button class=\"btn select-xml-view\">XML</button>\n    </div>\n    <button class=\"btn print-list hidden-phone\"><i class=\"icon-print\"></i>&nbsp;Print</button>\n    <button class=\"btn\" data-dismiss=\"modal\" aria-hidden=\"true\">Close</button>\n</div>"));
       this.fancy_container = $(this.list_modal.find('div.modal-body .fancy-list'));
       this.fancy_total_points_container = $(this.list_modal.find('div.modal-header .total-points'));
       this.simple_container = $(this.list_modal.find('div.modal-body .simple-list'));
       this.bbcode_container = $(this.list_modal.find('div.modal-body .bbcode-list'));
       this.bbcode_textarea = $(this.bbcode_container.find('textarea'));
       this.bbcode_textarea.attr('readonly', 'readonly');
+      this.xml_container = $(this.list_modal.find('div.modal-body .xml-list'));
+      this.xml_textarea = $(this.xml_container.find('textarea'));
+      this.xml_textarea.attr('readonly', 'readonly');
       this.select_simple_view_button = $(this.list_modal.find('.select-simple-view'));
       this.select_simple_view_button.click((function(_this) {
         return function(e) {
@@ -223,7 +226,8 @@
             _this.list_display_mode = 'simple';
             _this.simple_container.show();
             _this.fancy_container.hide();
-            return _this.bbcode_container.hide();
+            _this.bbcode_container.hide();
+            return _this.xml_container.hide();
           }
         };
       })(this));
@@ -237,7 +241,8 @@
             _this.list_display_mode = 'fancy';
             _this.fancy_container.show();
             _this.simple_container.hide();
-            return _this.bbcode_container.hide();
+            _this.bbcode_container.hide();
+            return _this.xml_container.hide();
           }
         };
       })(this));
@@ -252,8 +257,26 @@
             _this.bbcode_container.show();
             _this.simple_container.hide();
             _this.fancy_container.hide();
+            _this.xml_container.hide();
             _this.bbcode_textarea.select();
             return _this.bbcode_textarea.focus();
+          }
+        };
+      })(this));
+      this.select_xml_view_button = $(this.list_modal.find('.select-xml-view'));
+      this.select_xml_view_button.click((function(_this) {
+        return function(e) {
+          _this.select_xml_view_button.blur();
+          if (_this.list_display_mode !== 'xml') {
+            _this.list_modal.find('.list-display-mode .btn').removeClass('btn-inverse');
+            _this.select_xml_view_button.addClass('btn-inverse');
+            _this.list_display_mode = 'xml';
+            _this.xml_container.show();
+            _this.simple_container.hide();
+            _this.fancy_container.hide();
+            _this.bbcode_container.hide();
+            _this.xml_textarea.select();
+            return _this.xml_textarea.focus();
           }
         };
       })(this));
@@ -423,7 +446,7 @@
                     return results = arguments[0];
                   };
                 })(),
-                lineno: 417
+                lineno: 442
               }));
               __iced_deferrals._fulfill();
             })(function() {
@@ -557,7 +580,7 @@
     };
 
     SquadBuilder.prototype.onPointsUpdated = function(cb) {
-      var bbcode_ships, i, ship, _i, _j, _len, _len1, _ref, _ref1;
+      var bbcode_ships, i, ship, xml_ships, _i, _j, _len, _len1, _ref, _ref1;
       this.total_points = 0;
       _ref = this.ships;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
@@ -571,6 +594,7 @@
       this.fancy_container.text('');
       this.simple_container.html('<table></table>');
       bbcode_ships = [];
+      xml_ships = [];
       _ref1 = this.ships;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         ship = _ref1[_j];
@@ -578,9 +602,11 @@
           this.fancy_container.append(ship.toHTML());
           this.simple_container.find('table').append(ship.toTableRow());
           bbcode_ships.push(ship.toBBCode());
+          xml_ships.push(ship.toXML());
         }
       }
-      this.bbcode_container.find('textarea').val($.trim("" + (bbcode_ships.join("\n\n")) + "\n\n[b][i]Total: " + this.total_points + "[/i][/b]\n\n[url=" + (this.permalink.attr('href')) + "]View in Yet Another Squad Builder[/url]"));
+      this.bbcode_container.find('textarea').val($.trim("" + (bbcode_ships.join("\n\n")) + "[b][i]Total: " + this.total_points + "[/i][/b][url=" + (this.permalink.attr('href')) + "]View in Yet Another Squad Builder[/url]"));
+      this.xml_container.find('textarea').val($.trim("<XML>\n" + (xml_ships.join("\n")) + "\n</XML>"));
       return cb(this.total_points);
     };
 
@@ -760,7 +786,7 @@
             funcname: "SquadBuilder.removeShip"
           });
           ship.destroy(__iced_deferrals.defer({
-            lineno: 719
+            lineno: 743
           }));
           __iced_deferrals._fulfill();
         });
@@ -773,7 +799,7 @@
               funcname: "SquadBuilder.removeShip"
             });
             _this.container.trigger('xwing:pointsUpdated', __iced_deferrals.defer({
-              lineno: 720
+              lineno: 744
             }));
             __iced_deferrals._fulfill();
           })(function() {
@@ -1478,7 +1504,7 @@
                 });
                 _this.builder.container.trigger('xwing:claimUnique', [
                   new_pilot, 'Pilot', __iced_deferrals.defer({
-                    lineno: 1057
+                    lineno: 1081
                   })
                 ]);
                 __iced_deferrals._fulfill();
@@ -1527,7 +1553,7 @@
               });
               _this.builder.container.trigger('xwing:releaseUnique', [
                 _this.pilot, 'Pilot', __iced_deferrals.defer({
-                  lineno: 1070
+                  lineno: 1094
                 })
               ]);
               __iced_deferrals._fulfill();
@@ -1580,14 +1606,14 @@
           });
           if (_this.title != null) {
             _this.title.destroy(__iced_deferrals.defer({
-              lineno: 1092
+              lineno: 1116
             }));
           }
           _ref = _this.upgrades;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             upgrade = _ref[_i];
             upgrade.destroy(__iced_deferrals.defer({
-              lineno: 1094
+              lineno: 1118
             }));
           }
           _ref1 = _this.modifications;
@@ -1595,7 +1621,7 @@
             modification = _ref1[_j];
             if (modification != null) {
               modification.destroy(__iced_deferrals.defer({
-                lineno: 1096
+                lineno: 1120
               }));
             }
           }
@@ -1904,6 +1930,75 @@
       return bbcode;
     };
 
+    Ship.prototype.toXML = function() {
+      var action, action_bar, effective_stats, holder, modification, slotted_upgrades, upgrade, upgrade_xml, xml, xml_upgrades, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      effective_stats = this.effectiveStats();
+      action_bar = "\n    <Actions>";
+      _ref = effective_stats.actions;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        action = _ref[_i];
+        action_bar += "\n       <Action>" + action + "</Action>";
+      }
+      action_bar += "\n   </Actions>";
+      holder = $('<div>').html(this.pilot.text);
+      holder.find('br').replaceWith("\n");
+      holder.find('img[alt="Focus"]').replaceWith("Focus");
+      holder.find('img[alt="Evade"]').replaceWith("Evade");
+      holder.find('img[alt="Hit"]').replaceWith("Hit");
+      holder.find('img[alt="Crit"]').replaceWith("Crit");
+      holder.find('img[alt="Turn Right"]').replaceWith("Turn Right");
+      holder.find('img[alt="Turn Left"]').replaceWith("Turn Left");
+      holder.find('img[alt="Bank Right"]').replaceWith("Bank Right");
+      holder.find('img[alt="Bank Left"]').replaceWith("Bank Left");
+      holder.find('img[alt="Straight"]').replaceWith("Straight");
+      holder.find('img[alt="Barrel Roll"]').replaceWith("Barrel Roll");
+      holder.find('img[alt="Boost"]').replaceWith("Boost");
+      holder.find('img[alt="Target Lock"]').replaceWith("Target Lock");
+      holder.find('img[alt="Torpedo"]').replaceWith("Torpedo");
+      xml = $.trim(("<Ship>\n    <Faction>" + this.pilot.faction + "</Faction>\n    <Type>" + this.data.name + "</Type>\n    <Pilot>" + this.pilot.name + "</Pilot>\n    <Points>" + this.pilot.points + "</Points>\n    <Score>" + (statAndEffectiveStat(this.pilot.skill, effective_stats, 'skill')) + "</Score>\n    <Attack>" + (statAndEffectiveStat((_ref1 = (_ref2 = this.pilot.ship_override) != null ? _ref2.attack : void 0) != null ? _ref1 : this.data.attack, effective_stats, 'attack')) + "</Attack>\n    <Agility>" + (statAndEffectiveStat((_ref3 = (_ref4 = this.pilot.ship_override) != null ? _ref4.agility : void 0) != null ? _ref3 : this.data.agility, effective_stats, 'agility')) + "</Agility>\n    <Shields>" + (statAndEffectiveStat((_ref5 = (_ref6 = this.pilot.ship_override) != null ? _ref6.shields : void 0) != null ? _ref5 : this.data.shields, effective_stats, 'shields')) + "</Shields>\n    <Hull>" + (statAndEffectiveStat((_ref7 = (_ref8 = this.pilot.ship_override) != null ? _ref8.hull : void 0) != null ? _ref7 : this.data.hull, effective_stats, 'hull')) + "</Hull>\n    <Text>") + holder.text() + "</Text>");
+      xml += action_bar;
+      slotted_upgrades = ((function() {
+        var _j, _len1, _ref9, _results;
+        _ref9 = this.upgrades;
+        _results = [];
+        for (_j = 0, _len1 = _ref9.length; _j < _len1; _j++) {
+          upgrade = _ref9[_j];
+          if (upgrade.data != null) {
+            _results.push(upgrade);
+          }
+        }
+        return _results;
+      }).call(this)).concat((function() {
+        var _j, _len1, _ref9, _results;
+        _ref9 = this.modifications;
+        _results = [];
+        for (_j = 0, _len1 = _ref9.length; _j < _len1; _j++) {
+          modification = _ref9[_j];
+          if (modification.data != null) {
+            _results.push(modification);
+          }
+        }
+        return _results;
+      }).call(this));
+      if (((_ref9 = this.title) != null ? _ref9.data : void 0) != null) {
+        slotted_upgrades.push(this.title);
+      }
+      if (slotted_upgrades.length > 0) {
+        xml += "\n";
+        xml_upgrades = [];
+        for (_j = 0, _len1 = slotted_upgrades.length; _j < _len1; _j++) {
+          upgrade = slotted_upgrades[_j];
+          upgrade_xml = upgrade.toXML();
+          if (upgrade_xml != null) {
+            xml_upgrades.push(upgrade_xml);
+          }
+        }
+        xml += xml_upgrades.join("\n");
+        xml += "</Ship>";
+      }
+      return xml;
+    };
+
     Ship.prototype.toSerialized = function() {
       var addon, conferredAddonsList, conferred_addons, i, upgrade, upgrades, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       conferred_addons = (_ref = (_ref1 = this.title) != null ? _ref1.conferredAddons : void 0) != null ? _ref : [];
@@ -2099,7 +2194,7 @@
               });
               _this.ship.builder.container.trigger('xwing:releaseUnique', [
                 _this.data, _this.type, __iced_deferrals.defer({
-                  lineno: 1442
+                  lineno: 1522
                 })
               ]);
               __iced_deferrals._fulfill();
@@ -2175,7 +2270,7 @@
                 });
                 _this.ship.builder.container.trigger('xwing:releaseUnique', [
                   _this.data, _this.type, __iced_deferrals.defer({
-                    lineno: 1472
+                    lineno: 1552
                   })
                 ]);
                 __iced_deferrals._fulfill();
@@ -2197,7 +2292,7 @@
                   });
                   _this.ship.builder.container.trigger('xwing:claimUnique', [
                     new_data, _this.type, __iced_deferrals.defer({
-                      lineno: 1475
+                      lineno: 1555
                     })
                   ]);
                   __iced_deferrals._fulfill();
@@ -2262,7 +2357,7 @@
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             addon = _ref[_i];
             addon.destroy(__iced_deferrals.defer({
-              lineno: 1500
+              lineno: 1580
             }));
           }
           __iced_deferrals._fulfill();
@@ -2329,6 +2424,30 @@
     GenericAddon.prototype.toBBCode = function() {
       if (this.data != null) {
         return "[i]" + this.data.name + " (" + this.data.points + ")[/i]";
+      } else {
+        return null;
+      }
+    };
+
+    GenericAddon.prototype.toXML = function() {
+      var holder;
+      holder = $('<div>').html(this.data.text);
+      holder.find('br').replaceWith("\n");
+      holder.find('img[alt="Focus"]').replaceWith("Focus");
+      holder.find('img[alt="Evade"]').replaceWith("Evade");
+      holder.find('img[alt="Hit"]').replaceWith("Hit");
+      holder.find('img[alt="Crit"]').replaceWith("Crit");
+      holder.find('img[alt="Turn Right"]').replaceWith("Turn Right");
+      holder.find('img[alt="Turn Left"]').replaceWith("Turn Left");
+      holder.find('img[alt="Bank Right"]').replaceWith("Bank Right");
+      holder.find('img[alt="Bank Left"]').replaceWith("Bank Left");
+      holder.find('img[alt="Straight"]').replaceWith("Straight");
+      holder.find('img[alt="Barrel Roll"]').replaceWith("Barrel Roll");
+      holder.find('img[alt="Boost"]').replaceWith("Boost");
+      holder.find('img[alt="Target Lock"]').replaceWith("Target Lock");
+      holder.find('img[alt="Torpedo"]').replaceWith("Torpedo");
+      if (this.data != null) {
+        return (" <Addon>\n<Type>" + this.data.type + "</Type>\n<Name>" + this.data.name + "</Name>\n<Points>" + this.data.points + "</Points>\n<Text>") + holder.text() + "</Text>\n</Addon>";
       } else {
         return null;
       }

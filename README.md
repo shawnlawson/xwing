@@ -32,9 +32,10 @@ Building
 
 1. Install [Node.js](http://nodejs.org/) to get `npm`.
 2. Run `sudo npm install` to install the dependencies listed in `package.json`.
-3. Install [Ruby](https://www.ruby-lang.org/en/) to get `gem`.
-4. Install [Bundler](http//bundler.io): `sudo gem install bundler`
-5. Use Bundler to install the remaining dependencies listed in `Gemfile`: `sudo bundle install`
+3. Install `sudo npm install -g coffee-script`
+4. Install [Ruby](https://www.ruby-lang.org/en/) to get `gem`.
+5. Install [Bundler](http//bundler.io): `sudo gem install bundler`
+6. Use Bundler to install the remaining dependencies listed in `Gemfile`: `sudo bundle install`
 
 Then run `cake build` and all the HTML, CoffeeScript, and CSS files will be created.
 

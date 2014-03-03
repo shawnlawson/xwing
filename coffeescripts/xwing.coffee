@@ -210,12 +210,17 @@ class exportObj.SquadBuilder
                     Copy the BBCode below and paste it into your forum post.
                     <textarea></textarea>
                 </div>
+                <div class="xml-list">
+                    something
+                    <textarea></textarea>
+                </div>
             </div>
             <div class="modal-footer hidden-print">
                 <div class="btn-group list-display-mode">
                     <button class="btn select-simple-view">Simple</button>
                     <button class="btn select-fancy-view hidden-phone">Fancy</button>
                     <button class="btn select-bbcode-view">BBCode</button>
+                    <button class="btn select-xml-view">XML</button>
                 </div>
                 <button class="btn print-list hidden-phone"><i class="icon-print"></i>&nbsp;Print</button>
                 <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
@@ -227,6 +232,9 @@ class exportObj.SquadBuilder
         @bbcode_container = $ @list_modal.find('div.modal-body .bbcode-list')
         @bbcode_textarea = $ @bbcode_container.find('textarea')
         @bbcode_textarea.attr 'readonly', 'readonly'
+        @xml_container = $ @list_modal.find('div.modal-body .xml-list')
+        @xml_textarea = $ @xml_container.find('textarea')
+        @xml_textarea.attr 'readonly', 'readonly'
 
         @select_simple_view_button = $ @list_modal.find('.select-simple-view')
         @select_simple_view_button.click (e) =>
@@ -238,6 +246,7 @@ class exportObj.SquadBuilder
                 @simple_container.show()
                 @fancy_container.hide()
                 @bbcode_container.hide()
+                @xml_container.hide()
 
         @select_fancy_view_button = $ @list_modal.find('.select-fancy-view')
         @select_fancy_view_button.click (e) =>
@@ -249,6 +258,7 @@ class exportObj.SquadBuilder
                 @fancy_container.show()
                 @simple_container.hide()
                 @bbcode_container.hide()
+                @xml_container.hide()
 
         @select_bbcode_view_button = $ @list_modal.find('.select-bbcode-view')
         @select_bbcode_view_button.click (e) =>
@@ -260,8 +270,23 @@ class exportObj.SquadBuilder
                 @bbcode_container.show()
                 @simple_container.hide()
                 @fancy_container.hide()
+                @xml_container.hide()
                 @bbcode_textarea.select()
                 @bbcode_textarea.focus()
+
+        @select_xml_view_button = $ @list_modal.find('.select-xml-view')
+        @select_xml_view_button.click (e) =>
+            @select_xml_view_button.blur()
+            unless @list_display_mode == 'xml'
+                @list_modal.find('.list-display-mode .btn').removeClass 'btn-inverse'
+                @select_xml_view_button.addClass 'btn-inverse'
+                @list_display_mode = 'xml'
+                @xml_container.show()
+                @simple_container.hide()
+                @fancy_container.hide()
+                @bbcode_container.hide()
+                @xml_textarea.select()
+                @xml_textarea.focus()
 
         if $(window).width() >= 768
             @simple_container.hide()
@@ -578,17 +603,16 @@ class exportObj.SquadBuilder
         @fancy_container.text ''
         @simple_container.html '<table></table>'
         bbcode_ships = []
+        xml_ships = []
         for ship in @ships
             if ship.pilot?
                 @fancy_container.append ship.toHTML()
                 @simple_container.find('table').append ship.toTableRow()
                 bbcode_ships.push ship.toBBCode()
-        @bbcode_container.find('textarea').val $.trim """#{bbcode_ships.join "\n\n"}
-
-[b][i]Total: #{@total_points}[/i][/b]
-
-[url=#{@permalink.attr 'href'}]View in Yet Another Squad Builder[/url]
+                xml_ships.push ship.toXML()
+        @bbcode_container.find('textarea').val $.trim """#{bbcode_ships.join "\n\n"}[b][i]Total: #{@total_points}[/i][/b][url=#{@permalink.attr 'href'}]View in Yet Another Squad Builder[/url]
 """
+        @xml_container.find('textarea').val $.trim """<XML>\n#{xml_ships.join "\n"}\n</XML>"""
         cb @total_points
 
     onSquadLoadRequested: (squad) =>
@@ -1312,6 +1336,62 @@ class Ship
 
         bbcode
 
+    toXML: ->
+        effective_stats = @effectiveStats()
+        action_bar = """\n    <Actions>
+        """
+        for action in effective_stats.actions
+            action_bar += """\n       <Action>""" + action + """</Action>
+            """
+
+        action_bar += """\n   </Actions>
+        """
+
+        holder = $('<div>').html(@pilot.text);
+        holder.find('br').replaceWith( "\n" );
+        holder.find('img[alt="Focus"]').replaceWith( "Focus" );
+        holder.find('img[alt="Evade"]').replaceWith( "Evade");
+        holder.find('img[alt="Hit"]').replaceWith( "Hit");
+        holder.find('img[alt="Crit"]').replaceWith( "Crit");
+        holder.find('img[alt="Turn Right"]').replaceWith( "Turn Right");
+        holder.find('img[alt="Turn Left"]').replaceWith( "Turn Left");
+        holder.find('img[alt="Bank Right"]').replaceWith( "Bank Right");
+        holder.find('img[alt="Bank Left"]').replaceWith( "Bank Left");
+        holder.find('img[alt="Straight"]').replaceWith( "Straight");
+        holder.find('img[alt="Barrel Roll"]').replaceWith( "Barrel Roll");
+        holder.find('img[alt="Boost"]').replaceWith( "Boost");
+        holder.find('img[alt="Target Lock"]').replaceWith( "Target Lock");
+        holder.find('img[alt="Torpedo"]').replaceWith( "Torpedo");
+
+        xml = $.trim """
+            <Ship>
+                <Faction>#{@pilot.faction}</Faction>
+                <Type>#{@data.name}</Type>
+                <Pilot>#{@pilot.name}</Pilot>
+                <Points>#{@pilot.points}</Points>
+                <Score>#{statAndEffectiveStat(@pilot.skill, effective_stats, 'skill')}</Score>
+                <Attack>#{statAndEffectiveStat((@pilot.ship_override?.attack ? @data.attack), effective_stats, 'attack')}</Attack>
+                <Agility>#{statAndEffectiveStat((@pilot.ship_override?.agility ? @data.agility), effective_stats, 'agility')}</Agility>
+                <Shields>#{statAndEffectiveStat((@pilot.ship_override?.shields ? @data.shields), effective_stats, 'shields')}</Shields>
+                <Hull>#{statAndEffectiveStat((@pilot.ship_override?.hull ? @data.hull), effective_stats, 'hull')}</Hull>
+                <Text>"""+holder.text()+"""</Text>
+        """
+        xml += action_bar
+
+        slotted_upgrades = (upgrade for upgrade in @upgrades when upgrade.data?)
+            .concat (modification for modification in @modifications when modification.data?)
+        slotted_upgrades.push @title if @title?.data?
+        if slotted_upgrades.length > 0
+            xml +="\n"
+            xml_upgrades= []
+            for upgrade in slotted_upgrades
+                upgrade_xml = upgrade.toXML()
+                xml_upgrades.push upgrade_xml if upgrade_xml?
+            xml += xml_upgrades.join "\n"
+            xml += """\n</Ship>"""
+
+        xml
+
     toSerialized: ->
         # PILOT_ID:UPGRADEID1,UPGRADEID2:TITLEID:MODIFICATIONID:TITLEADDONTYPE1.TITLEADDONID1,TITLEADDONTYPE2.TITLEADDONID2
 
@@ -1554,6 +1634,35 @@ class GenericAddon
     toBBCode: ->
         if @data?
             """[i]#{@data.name} (#{@data.points})[/i]"""
+        else
+            null
+
+    toXML: ->
+        holder = $('<div>').html(@data.text);
+        holder.find('br').replaceWith( "\n" );
+        holder.find('img[alt="Focus"]').replaceWith( "Focus" );
+        holder.find('img[alt="Evade"]').replaceWith( "Evade");
+        holder.find('img[alt="Hit"]').replaceWith( "Hit");
+        holder.find('img[alt="Crit"]').replaceWith( "Crit");
+        holder.find('img[alt="Turn Right"]').replaceWith( "Turn Right");
+        holder.find('img[alt="Turn Left"]').replaceWith( "Turn Left");
+        holder.find('img[alt="Bank Right"]').replaceWith( "Bank Right");
+        holder.find('img[alt="Bank Left"]').replaceWith( "Bank Left");
+        holder.find('img[alt="Straight"]').replaceWith( "Straight");
+        holder.find('img[alt="Barrel Roll"]').replaceWith( "Barrel Roll");
+        holder.find('img[alt="Boost"]').replaceWith( "Boost");
+        holder.find('img[alt="Target Lock"]').replaceWith( "Target Lock");
+        holder.find('img[alt="Torpedo"]').replaceWith( "Torpedo");
+
+        if @data?
+            """ 
+                <Addon>
+                    <Type>#{@data.type}</Type>
+                    <Name>#{@data.name}</Name>
+                    <Points>#{@data.points}</Points>
+                    <Text>"""+holder.text()+"""</Text>
+                </Addon>
+            """
         else
             null
 
